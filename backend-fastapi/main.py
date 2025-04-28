@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+print('Starting backend server (main.py)')
 from routers import bonsai, ai_care
 from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv

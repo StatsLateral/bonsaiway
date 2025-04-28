@@ -51,6 +51,15 @@ async def get_bonsais(authorization: str = Header(None)):
 async def create_bonsai(bonsai: BonsaiCreate, authorization: str = Header(None)):
     auth = await get_authorization(authorization)
     user_id = await supabase_service.get_user_id(auth)
+    # Ensure user_id is a valid UUID string
+    import uuid
+    try:
+        user_id = str(uuid.UUID(user_id))
+    except Exception:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invalid user_id: not a valid UUID."
+        )
     
     bonsai_data = {
         "title": bonsai.title,
@@ -102,6 +111,56 @@ async def upload_bonsai_image(
         file_content,
         file.filename
     )
+
+@router.post("/with-image", response_model=Bonsai)
+async def create_bonsai_with_image(
+    file: UploadFile = File(...),
+    title: str = Form("New Bonsai"),  # Default title if not provided
+    description: Optional[str] = Form(None),
+    authorization: str = Header(None)
+):
+    print('HIT /api/bonsais/with-image endpoint')
+    try:
+        auth = await get_authorization(authorization)
+        user_id = await supabase_service.get_user_id(auth)
+        # Ensure user_id is a valid UUID string
+        import uuid
+        try:
+            user_id = str(uuid.UUID(user_id))
+        except Exception:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Invalid user_id: not a valid UUID."
+            )
+        
+        # Read file content first
+        file_content = await file.read()
+        
+        # Create the bonsai
+        bonsai_data = {
+            "title": title,
+            "description": description
+        }
+        
+        bonsai = await supabase_service.create_bonsai(user_id, bonsai_data)
+        
+        # Then upload the image for this bonsai
+        await supabase_service.upload_bonsai_image(
+            str(bonsai.id),
+            user_id,
+            file_content,
+            file.filename
+        )
+        
+        # Return the bonsai with the image
+        return await supabase_service.get_bonsai(str(bonsai.id), user_id)
+    except Exception as e:
+        # Log the error for debugging
+        print(f"Error in create_bonsai_with_image: {str(e)}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to create bonsai with image: {str(e)}"
+        )
 
 @router.delete("/{bonsai_id}/images/{image_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_bonsai_image(bonsai_id: UUID4, image_id: UUID4, authorization: str = Header(None)):

@@ -21,7 +21,7 @@ class OpenAIService:
         if not openai_api_key:
             raise ValueError("OpenAI API key not configured")
         
-        self.model = "gpt-4"  # Default model, can be configured
+        self.model = "gpt-4o"  # Default model, can be configured
     
     async def generate_bonsai_insight(
         self, 
@@ -53,7 +53,7 @@ class OpenAIService:
                 messages=[
                     {
                         "role": "system", 
-                        "content": "You are a bonsai expert assistant. Provide helpful, accurate advice about bonsai care, styling, and maintenance. Your responses should be informative, practical, and tailored to the specific bonsai being discussed."
+                        "content": "You are a master gardener with specialized skills in making bonsais and the philosophy behind creating bonsais. You are like a 95-year old bonsai master who has been developing 100s of bonsais for the past 40 years. Your bonsais are at the level of a major bondai museum display. You provide helpful, accurate advice about bonsai care, styling, and maintenance. Your responses must be accurate informative, practical, and tailored to the specific bonsai being discussed. With each bonsai, there will be a picture and if the tree name is missing, identify the tree name first."
                     },
                     {
                         "role": "user", 

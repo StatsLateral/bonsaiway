@@ -13,9 +13,22 @@ api.interceptors.request.use(
   (config) => {
     // Get token from localStorage if we're in the browser
     if (typeof window !== 'undefined') {
-      const token = localStorage.getItem('supabase.auth.token');
-      if (token) {
-        config.headers.Authorization = `Bearer ${token}`;
+      // Try to get the session data from localStorage
+      const supabaseSession = localStorage.getItem('sb-rtqkglqmfnllmawduzyr-auth-token');
+      
+      if (supabaseSession) {
+        try {
+          // Parse the session data
+          const session = JSON.parse(supabaseSession);
+          // Get the access token
+          const token = session?.access_token;
+          
+          if (token) {
+            config.headers.Authorization = `Bearer ${token}`;
+          }
+        } catch (error) {
+          console.error('Error parsing auth token:', error);
+        }
       }
     }
     return config;
@@ -45,6 +58,14 @@ export const bonsaiApi = {
   // Upload an image for a bonsai
   uploadImage: (bonsaiId, formData) => 
     api.post(`/api/bonsais/${bonsaiId}/images`, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    }),
+    
+  // Create a new bonsai with an image in one step
+  createBonsaiWithImage: (formData) => 
+    api.post('/api/bonsais/with-image', formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
       },

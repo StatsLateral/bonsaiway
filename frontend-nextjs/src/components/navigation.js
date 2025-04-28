@@ -20,9 +20,9 @@ export default function Navigation() {
               <Link href="/" className="text-sm font-medium text-slate-700 hover:text-slate-900">
                 My Bonsais
               </Link>
-              <Link href="/bonsai/new" className="text-sm font-medium text-slate-700 hover:text-slate-900">
-                Add Bonsai
-              </Link>
+              <span className="text-sm font-medium text-slate-700 hover:text-slate-900 cursor-default">
+                BonsaiWay
+              </span>
             </nav>
           )}
         </div>
