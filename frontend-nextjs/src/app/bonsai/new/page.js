@@ -16,4 +16,4 @@ export default function NewBonsai() {
   // This page will not be displayed as we redirect immediately
   return null;
 }
-}
+
